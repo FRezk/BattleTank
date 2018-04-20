@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "TankPlayerController.h"
+#include "Engine/World.h"
 #include "BattleTank.h"
 
 #define OUT
@@ -30,12 +31,16 @@ void ATankPlayerController::Tick(float DeltaTime) {
 	 if (!GetControlledTank()) { return; }
 	 FVector HitLocation;
 	 if (GetSightRayHitLocation(HitLocation)) {
-		 UE_LOG(LogTemp, Warning, TEXT("%s"), *HitLocation.ToString());
+		 //UE_LOG(LogTemp, Warning, TEXT("%s"), *HitLocation.ToString());
 	 }
  }
 
- bool ATankPlayerController::GetSightRayHitLocation(FVector& HitLocation) const {
-	 HitLocation = FVector(1.0);
+ bool ATankPlayerController::GetSightRayHitLocation(FVector& OutHitLocation) const {
+	 OutHitLocation = FVector(1.0);
+	 int32 ViewportSizeX, ViewportSizeY;
+	 GetViewportSize(ViewportSizeX, ViewportSizeY);
+	 auto CrosshairLocation = FVector2D(ViewportSizeX * CrosshairXLocation, ViewportSizeY * CrosshairYLocation);
+	 UE_LOG(LogTemp, Warning, TEXT("Crosshair at: %s"), *CrosshairLocation.ToString());
 	 return true;
  }
 
