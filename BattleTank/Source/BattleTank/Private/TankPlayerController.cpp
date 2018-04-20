@@ -35,25 +35,47 @@ void ATankPlayerController::Tick(float DeltaTime) {
 	 }
  }
 
- bool ATankPlayerController::GetSightRayHitLocation(FVector& OutHitLocation) const {
-	 OutHitLocation = FVector(1.0);
+ bool ATankPlayerController::GetSightRayHitLocation(FVector& out_HitLocation) const {
+	 
 	 FVector WorldDirection;
-	 if (GetLookingDirection(WorldDirection)) {
-		 UE_LOG(LogTemp, Warning, TEXT("%s"), *WorldDirection.ToString());
+	 if (GetLookingDirection(WorldDirection))
+	 {
+		 GetLookVectorHitLocation(WorldDirection, out_HitLocation);
+		 UE_LOG(LogTemp, Warning, TEXT("Aeww %s"), *out_HitLocation.ToString());
 	 }
 	 return true;
  }
 
  bool ATankPlayerController::GetLookingDirection(FVector& WorldDirection) const {
 	 int32 ViewportSizeX, ViewportSizeY;
-	 GetViewportSize(ViewportSizeX, ViewportSizeY);
+	 GetViewportSize(ViewportSizeX, ViewportSizeY); // Getting ViewportSizes
 	 auto CrosshairLocation = FVector2D(ViewportSizeX * CrosshairXLocation, ViewportSizeY * CrosshairYLocation);
+	 
 	 FVector discard; // will be discarded
 	 return DeprojectScreenPositionToWorld(
 		 CrosshairLocation.X,
 		 CrosshairLocation.Y,
 		 discard, WorldDirection);
  }
+
+ bool ATankPlayerController::GetLookVectorHitLocation(FVector WorldDirection, FVector& out_HitLocation) const {
+	 FHitResult HitResult; // Will be my Ray-Cast result
+	 auto StartLocation = PlayerCameraManager->GetCameraLocation(); // Player Location, so i know where to start to cast
+	 auto EndLocation = StartLocation + WorldDirection * LineTraceRange; // Will be discarded, but its the players rotation
+
+	 if (GetWorld()->LineTraceSingleByChannel(
+		 HitResult,
+		 StartLocation,
+		 EndLocation,
+		 ECollisionChannel::ECC_Visibility
+	 )) {
+		 out_HitLocation = HitResult.Location;
+		 return true;
+	 }
+	 out_HitLocation = FVector(0.0);
+	 return false;
+ }
+
 
 
   
