@@ -37,11 +37,22 @@ void ATankPlayerController::Tick(float DeltaTime) {
 
  bool ATankPlayerController::GetSightRayHitLocation(FVector& OutHitLocation) const {
 	 OutHitLocation = FVector(1.0);
+	 FVector WorldDirection;
+	 if (GetLookingDirection(WorldDirection)) {
+		 UE_LOG(LogTemp, Warning, TEXT("%s"), *WorldDirection.ToString());
+	 }
+	 return true;
+ }
+
+ bool ATankPlayerController::GetLookingDirection(FVector& WorldDirection) const {
 	 int32 ViewportSizeX, ViewportSizeY;
 	 GetViewportSize(ViewportSizeX, ViewportSizeY);
 	 auto CrosshairLocation = FVector2D(ViewportSizeX * CrosshairXLocation, ViewportSizeY * CrosshairYLocation);
-	 UE_LOG(LogTemp, Warning, TEXT("Crosshair at: %s"), *CrosshairLocation.ToString());
-	 return true;
+	 FVector discard; // will be discarded
+	 return DeprojectScreenPositionToWorld(
+		 CrosshairLocation.X,
+		 CrosshairLocation.Y,
+		 discard, WorldDirection);
  }
 
 
