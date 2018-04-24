@@ -2,8 +2,14 @@
 
 #include "TankAIController.h"
 #include "Engine/World.h"
+#include "BattleTank.h"
+
+ATankAIController::ATankAIController() {
+	//PrimaryActorTick.bCanEverTick = true;
+}
 
 void ATankAIController::BeginPlay() {
+	Super::BeginPlay();
 	auto ControlledTank = GetControlledTank();
 	if (!ControlledTank) {
 		UE_LOG(LogTemp, Error, TEXT("AI Tank not Possessed!"));
@@ -11,7 +17,12 @@ void ATankAIController::BeginPlay() {
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("AI Possessing : %s"), *ControlledTank->GetName());
 	}
-	GetPlayerTank();
+}
+
+void ATankAIController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	AimTowardsPlayer();
 }
 
 ATank * ATankAIController::GetControlledTank() const
@@ -19,20 +30,29 @@ ATank * ATankAIController::GetControlledTank() const
 	return Cast<ATank>(GetPawn());
 }
 
-void ATankAIController::GetPlayerTank() const
+void ATankAIController::AimTowardsPlayer() {
+	if (!GetControlledTank()) { return; }
+
+		FVector HitLocation = GetPlayerTank()->GetTargetLocation(); // The players location
+		GetControlledTank()->AimAt(HitLocation);
+}
+
+ATank* ATankAIController::GetPlayerTank() const
 {
 	auto FirstPlayerController = GetWorld()->GetFirstPlayerController();
 	if (FirstPlayerController) {
-		auto CastedFPC = Cast<ATank>(FirstPlayerController->GetPawn());
+		ATank* CastedFPC = Cast<ATank>(FirstPlayerController->GetPawn());
 		if (CastedFPC) {
-			UE_LOG(LogTemp, Warning, TEXT("Found the player tank! Its %s"), *CastedFPC->GetName());
+			return CastedFPC;
 		}
 		else {
 			UE_LOG(LogTemp, Error, TEXT("First Player Controller found, but its not a tank!"));
+			return nullptr;
 		}
 	}
 	else {
 		UE_LOG(LogTemp, Error, TEXT("First Player NOT FOUND!"));
+		return nullptr;
 	}
 	
 	

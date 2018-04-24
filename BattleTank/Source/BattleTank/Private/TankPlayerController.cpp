@@ -4,8 +4,6 @@
 #include "Engine/World.h"
 #include "BattleTank.h"
 
-#define OUT
-
 void ATankPlayerController::BeginPlay() {
 	Super::BeginPlay();
 
@@ -23,15 +21,16 @@ void ATankPlayerController::Tick(float DeltaTime) {
 	AimTowardsCrosshair();
 }
 
- ATank* ATankPlayerController::GetControlledTank() const {
+ATank* ATankPlayerController::GetControlledTank() const {
 	return Cast<ATank>(GetPawn());
 }
 
  void ATankPlayerController::AimTowardsCrosshair() {
 	 if (!GetControlledTank()) { return; }
-	 FVector HitLocation;
+
+	 FVector HitLocation; // Where our tank should aim
 	 if (GetSightRayHitLocation(HitLocation)) {
-		 //UE_LOG(LogTemp, Warning, TEXT("%s"), *HitLocation.ToString());
+		 GetControlledTank()->AimAt(HitLocation);
 	 }
  }
 
@@ -41,7 +40,6 @@ void ATankPlayerController::Tick(float DeltaTime) {
 	 if (GetLookingDirection(WorldDirection))
 	 {
 		 GetLookVectorHitLocation(WorldDirection, out_HitLocation);
-		 UE_LOG(LogTemp, Warning, TEXT("Aeww %s"), *out_HitLocation.ToString());
 	 }
 	 return true;
  }

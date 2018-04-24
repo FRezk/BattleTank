@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "AIController.h"
 #include "Tank.h"
-#include "TankAIController.generated.h"
+#include "AIController.h"
+#include "TankAIController.generated.h" // Must be the last include
 
 /**
  * 
@@ -14,11 +13,15 @@ UCLASS()
 class BATTLETANK_API ATankAIController : public AAIController
 {
 	GENERATED_BODY()
-	
+
 public:
+	ATankAIController();
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
+
+private:
 	ATank* GetControlledTank() const;
-	void GetPlayerTank() const;
-	
+	ATank* GetPlayerTank() const;
+	void AimTowardsPlayer();
 	
 };
